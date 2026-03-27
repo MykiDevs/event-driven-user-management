@@ -34,7 +34,7 @@ cd event-driven-user-management
 cp .env.example .env
 ```
 3. **Start all services:**
-#### Production mode ( uses pre-built images ):
+#### Production mode ( uses pre-built images from DockerHub ):
 ```bash
 docker compose up 
 ```
