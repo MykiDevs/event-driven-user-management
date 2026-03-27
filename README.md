@@ -18,6 +18,7 @@ A backend system built on a microservices architecture with communication via Ap
 - **MapStruct**
 - **OpenAPI / Swagger**
 - **Kafka**
+- **Redis**
 
 ### Prerequisites
 - Docker
