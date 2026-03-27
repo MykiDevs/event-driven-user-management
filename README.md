@@ -1,4 +1,4 @@
-# REST API NOTE APP
+# User Management Microservice App with Kafka and Redis
 A backend system built on a microservices architecture with asynchronous communication via Apache Kafka. Implements user registration with email verification, pagination, and idempotent event handling.
 
 ## Features
