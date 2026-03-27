@@ -1,5 +1,5 @@
 # User Management Microservice App with Kafka and Redis
-A backend system built on a microservices architecture with asynchronous communication via Apache Kafka. Implements user registration with email verification, pagination, and idempotent event handling.
+A backend system built on a microservices architecture with communication via Apache Kafka. Implements user registration with email verification, pagination, and idempotent event handling.
 
 ## Features
 - **Event-Driven Flow** — on user registration, a `UserCreatedEvent` is published to Kafka after transaction commit (`@TransactionalEventListener(AFTER_COMMIT)`), ensuring no phantom events on rollback
