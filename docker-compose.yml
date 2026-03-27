@@ -1,0 +1,142 @@
+x-controller-env: &controller-env
+  KAFKA_PROCESS_ROLES: 'controller'
+  KAFKA_LISTENERS: 'CONTROLLER://0.0.0.0:9093'
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT'
+  KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+  KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka-controller:9093'
+  CLUSTER_ID: '2j8M4HZo6B6i45vEY9boW4'
+x-broker-env: &broker-env
+  KAFKA_PROCESS_ROLES: 'broker'
+  KAFKA_LISTENERS: EXTERNAL://0.0.0.0:9092, INTERNAL://0.0.0.0:29092
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT, INTERNAL:PLAINTEXT, EXTERNAL:PLAINTEXT'
+  KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+  KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka-controller:9093'
+  CLUSTER_ID: '2j8M4HZo6B6i45vEY9boW4'
+  KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  KAFKA_CONTROLLER_QUORUM_FETCH_TIMEOUT_MS: 10000
+  KAFKA_CONTROLLER_QUORUM_REQUEST_TIMEOUT_MS: 10000
+x-service-env: &service-env
+  SPRING_PROFILES_ACTIVE: prod
+  POSTGRES_USER: ${POSTGRES_USER}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  POSTGRES_DB: ${POSTGRES_DB}
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+  KAFKA_PORT: ${KAFKA_PORT:-29092}
+  KAFKA_HOST: kafka
+services:
+  user-service:
+    image: mykidevs/user-service-eventdriven:v1
+    container_name: user-service
+    ports:
+      - "8080:8080"
+    environment:
+      <<: *service-env
+      REDIS_PORT: 6379
+      REDIS_HOST: redis
+    networks:
+      - backend
+    depends_on:
+      kafka:
+        condition: service_started
+      kafka-controller:
+        condition: service_started
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+    restart: on-failure
+  noti-service:
+    image: mykidevs/noti-service-eventdriven:v1
+    container_name: noti-service
+    ports:
+      - "8081:8081"
+    environment:
+      <<: *service-env
+      MAIL_HOST: mailhog
+      MAIL_SMTP_PORT: 1025
+      MAIL_WEB_PORT: 8025
+    networks:
+      - backend
+    depends_on:
+      user-service:
+        condition: service_started
+      kafka:
+        condition: service_started
+      kafka-controller:
+        condition: service_started
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+    restart: on-failure
+  kafka-controller:
+    image: confluentinc/cp-kafka:7.9.6
+    container_name: kafka-controller
+    environment:
+      <<: *controller-env
+      KAFKA_NODE_ID: 1
+    networks:
+      - backend
+    restart: on-failure
+  kafka:
+    image: confluentinc/cp-kafka:7.9.6
+    container_name: kafka
+    ports:
+      - "${KAFKA_PORT}:9092"
+    environment:
+      <<: *broker-env
+      KAFKA_NODE_ID: 2
+      KAFKA_LISTENERS: EXTERNAL://0.0.0.0:9092, INTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://kafka:29092, EXTERNAL://localhost:${KAFKA_PORT}'
+    depends_on:
+      - kafka-controller
+    networks:
+      - backend
+    restart: on-failure
+  postgres:
+    stop_grace_period: 30s
+    image: postgres:latest
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      start_interval: 5s
+      start_period: 80s
+      interval: 10s
+      timeout: 7s
+      retries: 5
+    networks:
+      - backend
+    restart: on-failure
+  redis:
+    image: redis:latest
+    ports:
+      - "${REDIS_PORT}:6379"
+    networks:
+      - backend
+    restart: on-failure
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "${MAIL_SMTP_PORT}:1025"
+      - "${MAIL_WEB_PORT}:8025"
+    networks:
+      - backend
+    restart: on-failure
+networks:
+  backend:
+    name: backend
+    driver: bridge

@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: user-service
+  threads:
+    virtual:
+      enabled: true
+  jpa:
+    open-in-view: false
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+

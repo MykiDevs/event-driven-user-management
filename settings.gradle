@@ -1,0 +1,5 @@
+rootProject.name = 'event-driven-user-management'
+
+include 'shared-lib'
+include 'user-service'
+include 'noti-service'

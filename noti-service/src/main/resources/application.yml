@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: noti-service
+  threads:
+    virtual:
+      enabled: true
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    enabled: true
+  kafka:
+    consumer:
+      group-id: noti-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
