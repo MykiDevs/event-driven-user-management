@@ -43,9 +43,11 @@ docker compose up
 docker compose -f docker-compose-dev.yml up
 ```
 ## Running Tests
+### user-service test
 ```bash
 ./gradlew :user-service:test
 ```
+### noti-service test
 ```bash
 ./gradlew :noti-service:test
 ```
