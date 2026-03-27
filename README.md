@@ -56,7 +56,7 @@ Integration tests require Docker (Testcontainers pulls PostgreSQL, Redis and Kaf
 ## API Reference (Dev profile)
 http://localhost:8080/swagger-ui/index.html`
 ## Notes
-- The current Kafka publishing uses `@TransactionalEventListener` + `@Async` as a lightweight alternative to a full outbox pattern. For production use, consider replacing with the Transactional Outbox Pattern.
+- The current Kafka publishing uses `@TransactionalEventListener` + `@Async` as a lightweight alternative to a full outbox pattern. For real production use, consider replacing with the Transactional Outbox Pattern.
 - MailHog is only included in the dev/local setup. In real production, configure an actual SMTP provider via environment variables.
 ## License
 [MIT](https://github.com/MykiDevs/event-driven-user-management/blob/main/LICENSE)
