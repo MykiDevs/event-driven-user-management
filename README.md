@@ -4,7 +4,7 @@ A backend system built on a microservices architecture with communication via Ap
 ## Features
 - **Event-Driven Flow** — on user registration, a `UserCreatedEvent` is published to Kafka after transaction commit (`@TransactionalEventListener(AFTER_COMMIT)`), ensuring no phantom events on rollback
 - **Idempotent Consumer** — noti-service deduplicates events by UUID before sending email, preventing duplicate notifications on Kafka redelivery
-- **Email Verification** — on registration a `VerifyToken` (TTL 1h) is persisted; user activates account via a link sent to their email
+- **Email Verification** — on registration a `VerifyToken` is persisted; user activates account via a link sent to their email
 - **Paginated User Listing** — supports page/size/sortBy/direction with validation of allowed sort fields
 - **Virtual Threads** — uses Project Loom virtual threads for improved throughput under I/O load
 - **Dev / Prod Profiles** — `dev` uses local Docker build + MailHog; `prod` pulls pre-built images from registry
