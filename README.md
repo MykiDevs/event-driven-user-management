@@ -10,7 +10,7 @@ A backend system built on a microservices architecture with communication via Ap
 - **Dev / Prod Profiles** — `dev` uses local Docker build + MailHog; `prod` pulls pre-built images from registry
 - **Integration Tests** — Testcontainers spins up real PostgreSQL, Redis and Kafka for integration tests
 
-## Tech Stackg
+## Tech Stack
 - **Java 25**
 - **Spring Boot 4**
 - **Postgres**
